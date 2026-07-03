@@ -81,28 +81,8 @@ export function CarpoolForm({ activityId }: { activityId: string }) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="carpool-location">Abfahrtsort</Label>
-            <Input
-              id="carpool-location"
-              name="departureLocation"
-              placeholder="z. B. Marktplatz"
-              required
-            />
-            {state.fieldErrors?.departureLocation && (
-              <p className="text-sm text-destructive">
-                {state.fieldErrors.departureLocation[0]}
-              </p>
-            )}
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="carpool-time">Abfahrtszeit</Label>
-            <Input
-              id="carpool-time"
-              name="departureTime"
-              type="datetime-local"
-              required
-            />
+            <Label htmlFor="carpool-time">Abfahrtszeit (optional)</Label>
+            <Input id="carpool-time" name="departureTime" type="datetime-local" />
             {state.fieldErrors?.departureTime && (
               <p className="text-sm text-destructive">
                 {state.fieldErrors.departureTime[0]}

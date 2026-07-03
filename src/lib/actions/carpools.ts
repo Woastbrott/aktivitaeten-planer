@@ -20,11 +20,11 @@ export async function createCarpool(
   if (!session?.user?.id) return { error: "Nicht eingeloggt." }
 
   const rawSeats = formData.get("seats")
+  const rawTime = formData.get("departureTime")
 
   const parsed = carpoolSchema.safeParse({
     seats: rawSeats ? Number(rawSeats) : NaN,
-    departureLocation: formData.get("departureLocation"),
-    departureTime: formData.get("departureTime"),
+    departureTime: rawTime || null,
   })
 
   if (!parsed.success) {
@@ -43,8 +43,9 @@ export async function createCarpool(
       activityId,
       driverId: session.user.id,
       seats: parsed.data.seats,
-      departureLocation: parsed.data.departureLocation,
-      departureTime: new Date(parsed.data.departureTime),
+      departureTime: parsed.data.departureTime
+        ? new Date(parsed.data.departureTime)
+        : null,
     },
   })
 

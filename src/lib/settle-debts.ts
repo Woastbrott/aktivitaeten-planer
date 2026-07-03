@@ -3,6 +3,13 @@ export type ExpenseInput = {
   paidById: string
 }
 
+export type Balance = {
+  userId: string
+  paid: number // cents this person paid in total
+  share: number // cents this person owes as their equal share
+  net: number // paid - share; positive = should receive, negative = owes
+}
+
 export type Settlement = {
   fromId: string
   toId: string
@@ -10,48 +17,56 @@ export type Settlement = {
 }
 
 /**
- * Splits all expenses evenly across participantIds and returns a minimal
- * set of payments that settles all balances (greedy largest-debtor vs
- * largest-creditor matching).
+ * Splits the total of all expenses evenly across participantIds and
+ * returns each person's paid/share/net balance. Payers who aren't in
+ * participantIds (shouldn't happen via the UI, but handled defensively)
+ * are included with share 0, since they don't owe a portion themselves.
  */
-export function settleDebts(
+export function computeBalances(
   expenses: ExpenseInput[],
   participantIds: string[]
-): Settlement[] {
-  if (participantIds.length === 0) return []
-
+): Balance[] {
   const total = expenses.reduce((sum, e) => sum + e.amount, 0)
-  if (total === 0) return []
+  const share = participantIds.length > 0 ? Math.floor(total / participantIds.length) : 0
+  const remainder = participantIds.length > 0 ? total - share * participantIds.length : 0
 
-  const share = Math.floor(total / participantIds.length)
-  const remainder = total - share * participantIds.length
-
-  // balance > 0 means this person is owed money, < 0 means they owe money
-  const balances = new Map<string, number>()
-  for (const id of participantIds) balances.set(id, -share)
+  const shareById = new Map<string, number>()
+  for (const id of participantIds) shareById.set(id, share)
 
   // distribute rounding remainder (1 cent each) deterministically
   participantIds
     .slice()
     .sort()
     .slice(0, remainder)
-    .forEach((id) => balances.set(id, (balances.get(id) ?? 0) - 1))
+    .forEach((id) => shareById.set(id, (shareById.get(id) ?? 0) + 1))
 
+  const paidById = new Map<string, number>()
+  for (const id of participantIds) paidById.set(id, 0)
   for (const expense of expenses) {
-    if (!balances.has(expense.paidById)) balances.set(expense.paidById, 0)
-    balances.set(
-      expense.paidById,
-      (balances.get(expense.paidById) ?? 0) + expense.amount
-    )
+    paidById.set(expense.paidById, (paidById.get(expense.paidById) ?? 0) + expense.amount)
+    if (!shareById.has(expense.paidById)) shareById.set(expense.paidById, 0)
   }
 
-  const debtors: { id: string; amount: number }[] = []
-  const creditors: { id: string; amount: number }[] = []
+  const allIds = new Set([...shareById.keys(), ...paidById.keys()])
 
-  for (const [id, balance] of balances.entries()) {
-    if (balance < 0) debtors.push({ id, amount: -balance })
-    else if (balance > 0) creditors.push({ id, amount: balance })
-  }
+  return Array.from(allIds).map((userId) => {
+    const paid = paidById.get(userId) ?? 0
+    const personShare = shareById.get(userId) ?? 0
+    return { userId, paid, share: personShare, net: paid - personShare }
+  })
+}
+
+/**
+ * Derives a minimal set of payments that settles all balances (greedy
+ * largest-debtor vs largest-creditor matching).
+ */
+export function settleDebts(balances: Balance[]): Settlement[] {
+  const debtors = balances
+    .filter((b) => b.net < 0)
+    .map((b) => ({ id: b.userId, amount: -b.net }))
+  const creditors = balances
+    .filter((b) => b.net > 0)
+    .map((b) => ({ id: b.userId, amount: b.net }))
 
   debtors.sort((a, b) => b.amount - a.amount)
   creditors.sort((a, b) => b.amount - a.amount)

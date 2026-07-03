@@ -25,7 +25,8 @@ model User {
   createdActivities Activity[]         @relation("ActivityCreator")
   participations    Participation[]
   comments          Comment[]
-  expensesPaid      Expense[]
+  expensesPaid      Expense[]          @relation("ExpensePayer")
+  expensesCreated   Expense[]          @relation("ExpenseCreator")
   carpoolsDriven    Carpool[]
   carpoolRides      CarpoolPassenger[]
   invitesCreated    Invite[]
@@ -86,24 +87,25 @@ model Comment {
 }
 
 model Expense {
-  id         String   @id @default(cuid())
-  activityId String
-  title      String
-  amount     Int // Cent
-  paidById   String
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  activityId  String
+  title       String
+  amount      Int // Cent
+  paidById    String
+  createdById String
+  createdAt   DateTime @default(now())
 
-  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  paidBy   User     @relation(fields: [paidById], references: [id], onDelete: Cascade)
+  activity  Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  paidBy    User     @relation("ExpensePayer", fields: [paidById], references: [id], onDelete: Cascade)
+  createdBy User     @relation("ExpenseCreator", fields: [createdById], references: [id], onDelete: Cascade)
 }
 
 model Carpool {
-  id                String   @id @default(cuid())
-  activityId        String
-  driverId          String
-  seats             Int
-  departureLocation String
-  departureTime     DateTime
+  id            String    @id @default(cuid())
+  activityId    String
+  driverId      String
+  seats         Int
+  departureTime DateTime?
 
   activity   Activity           @relation(fields: [activityId], references: [id], onDelete: Cascade)
   driver     User               @relation(fields: [driverId], references: [id], onDelete: Cascade)

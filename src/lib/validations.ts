@@ -42,6 +42,5 @@ export const expenseSchema = z.object({
 
 export const carpoolSchema = z.object({
   seats: z.number().int().positive("Mind. 1 Platz").max(20),
-  departureLocation: z.string().trim().min(1, "Abfahrtsort erforderlich").max(200),
-  departureTime: z.string().min(1, "Abfahrtszeit erforderlich"),
+  departureTime: z.string().optional().nullable(),
 })

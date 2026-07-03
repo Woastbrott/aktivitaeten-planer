@@ -86,9 +86,10 @@ Zulässig sind JPEG, PNG, WebP und GIF bis 5 MB pro Datei, maximal 8 Bilder pro 
 - **Accounts**: Registrierung, Login (Nutzername + Passwort), Beitritt über Einladungslink
 - **Aktivitäten**: Vorschlagen (inkl. Bilder), Kalender- und Listenansicht, Filter nach eigenen Aktivitäten, Teilnahmestatus (Dabei/Vielleicht/Abgesagt) ohne Teilnehmerlimit, Kommentare
 - **Bilder**: Upload beim Erstellen und nachträglich auf der Detailseite, Galerie-Ansicht, Titelbild auf der Aktivitäts-Card
-- **Kosten**: Ausgaben pro Aktivität erfassen, automatische Aufteilung auf Teilnehmer, vereinfachter Schuldenausgleich
-- **Fahrgemeinschaften**: Anbieten, beitreten, Übersicht wer noch eine Mitfahrgelegenheit braucht
+- **Kosten**: Ausgaben pro Aktivität erfassen (inkl. Bearbeiten/Löschen eigener Einträge), Kostenübersicht mit Anteil und Saldo pro Person, vereinfachter Schuldenausgleich ("wer schuldet wem")
+- **Fahrgemeinschaften**: Anbieten (Sitzplätze, optionale Abfahrtszeit), beitreten, Übersicht wer noch eine Mitfahrgelegenheit braucht
 - **Wetter**: Vorhersage für wetterrelevante Outdoor-Aktivitäten (bis 15 Tage im Voraus, sofern Ort und Datum feststehen)
+- **Kalender-Export**: Aktivitäten mit Termin lassen sich als `.ics`-Datei herunterladen und direkt im Apple Kalender (oder jeder anderen Kalender-App) speichern
 
 ## Projektstruktur
 

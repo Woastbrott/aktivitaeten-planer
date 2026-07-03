@@ -3,7 +3,7 @@
 import { useTransition } from "react"
 import { format } from "date-fns"
 import { de } from "date-fns/locale"
-import { Car, Clock, MapPin, Trash2, UserRound } from "lucide-react"
+import { Car, Clock, Trash2, UserRound } from "lucide-react"
 import { toast } from "sonner"
 
 import { deleteCarpool, joinCarpool, leaveCarpool } from "@/lib/actions/carpools"
@@ -106,18 +106,14 @@ export function CarpoolSection({
                   )}
                 </div>
 
-                <div className="grid gap-1 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="size-3.5 shrink-0" />
-                    {carpool.departureLocation}
-                  </div>
-                  <div className="flex items-center gap-1.5">
+                {carpool.departureTime && (
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <Clock className="size-3.5 shrink-0" />
                     {format(carpool.departureTime, "EEE, d. MMM · HH:mm 'Uhr'", {
                       locale: de,
                     })}
                   </div>
-                </div>
+                )}
 
                 {carpool.passengers.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">

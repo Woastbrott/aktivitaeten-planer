@@ -2,11 +2,12 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { format } from "date-fns"
 import { de } from "date-fns/locale"
-import { CalendarDays, MapPin, Users } from "lucide-react"
+import { CalendarDays, CalendarPlus, MapPin, Users } from "lucide-react"
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { activityDetailInclude } from "@/lib/types"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
   Tabs,
@@ -96,6 +97,15 @@ export default async function ActivityDetailPage({
             {goingParticipants.length} dabei
           </div>
         </div>
+
+        {activity.date && (
+          <Button asChild variant="outline" size="sm" className="w-fit">
+            <a href={`/api/activities/${activity.id}/ics`}>
+              <CalendarPlus />
+              Zum Kalender hinzufügen
+            </a>
+          </Button>
+        )}
       </div>
 
       <ImageGallery
@@ -134,6 +144,7 @@ export default async function ActivityDetailPage({
             activityId={activity.id}
             expenses={activity.expenses}
             goingParticipants={goingParticipants}
+            currentUserId={userId}
           />
         </TabsContent>
         <TabsContent value="carpool" className="pt-4">
