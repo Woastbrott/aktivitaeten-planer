@@ -18,7 +18,6 @@ import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { activityListInclude } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import { CATEGORY_STYLES } from "@/lib/categories"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = { title: "Kalender – Sommer-Planer" }
@@ -122,10 +121,7 @@ export default async function CalendarPage({
                     <Link
                       key={activity.id}
                       href={`/activities/${activity.id}`}
-                      className={cn(
-                        "block truncate rounded-md px-1.5 py-0.5 text-[11px] font-medium",
-                        CATEGORY_STYLES[activity.category]
-                      )}
+                      className="block truncate rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground"
                       title={activity.title}
                     >
                       {activity.title}

@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { CalendarDays, PartyPopper, Plus } from "lucide-react"
-import type { ActivityCategory, Prisma } from "@prisma/client"
+import type { Prisma } from "@prisma/client"
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
@@ -17,16 +17,13 @@ export const metadata: Metadata = { title: "Aktivitäten – Sommer-Planer" }
 export default async function ActivitiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; mine?: string }>
+  searchParams: Promise<{ mine?: string }>
 }) {
-  const { category, mine } = await searchParams
+  const { mine } = await searchParams
   const session = await auth()
   const userId = session!.user.id
 
   const where: Prisma.ActivityWhereInput = {}
-  if (category && category !== "all") {
-    where.category = category as ActivityCategory
-  }
   if (mine === "1") {
     where.participations = { some: { userId } }
   }

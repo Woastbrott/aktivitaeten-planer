@@ -20,14 +20,14 @@ export function RegisterForm({ inviteToken }: { inviteToken?: string }) {
   )
   // React resets the form's fields once the action succeeds, so the
   // submitted credentials must be captured before that happens.
-  const credentialsRef = useRef<{ email: string; password: string } | null>(
+  const credentialsRef = useRef<{ username: string; password: string } | null>(
     null
   )
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     const formData = new FormData(e.currentTarget)
     credentialsRef.current = {
-      email: String(formData.get("email") ?? ""),
+      username: String(formData.get("username") ?? ""),
       password: String(formData.get("password") ?? ""),
     }
   }
@@ -35,8 +35,8 @@ export function RegisterForm({ inviteToken }: { inviteToken?: string }) {
   useEffect(() => {
     if (!state.success || !credentialsRef.current) return
 
-    const { email, password } = credentialsRef.current
-    signIn("credentials", { email, password, redirect: false }).then(() => {
+    const { username, password } = credentialsRef.current
+    signIn("credentials", { username, password, redirect: false }).then(() => {
       router.push("/activities")
       router.refresh()
     })
@@ -63,17 +63,18 @@ export function RegisterForm({ inviteToken }: { inviteToken?: string }) {
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="email">E-Mail</Label>
+        <Label htmlFor="username">Nutzername</Label>
         <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="du@beispiel.de"
+          id="username"
+          name="username"
+          placeholder="dein-name"
+          autoCapitalize="none"
+          autoCorrect="off"
           required
         />
-        {state.fieldErrors?.email && (
+        {state.fieldErrors?.username && (
           <p className="text-sm text-destructive">
-            {state.fieldErrors.email[0]}
+            {state.fieldErrors.username[0]}
           </p>
         )}
       </div>

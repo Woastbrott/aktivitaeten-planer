@@ -45,3 +45,7 @@ next-env.d.ts
 # sqlite database
 /prisma/*.db
 /prisma/*.db-journal
+
+# user-uploaded activity images (local filesystem storage)
+/public/uploads/*
+!/public/uploads/.gitkeep

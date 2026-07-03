@@ -5,6 +5,7 @@ export const activityListInclude = {
     include: { user: { select: { id: true, name: true } } },
   },
   createdBy: { select: { id: true, name: true } },
+  images: { orderBy: { createdAt: "asc" }, take: 1 },
 } satisfies Prisma.ActivityInclude
 
 export type ActivityListItem = Prisma.ActivityGetPayload<{
@@ -13,7 +14,7 @@ export type ActivityListItem = Prisma.ActivityGetPayload<{
 
 export const activityDetailInclude = {
   participations: {
-    include: { user: { select: { id: true, name: true, email: true } } },
+    include: { user: { select: { id: true, name: true } } },
   },
   createdBy: { select: { id: true, name: true } },
   comments: {
@@ -30,6 +31,7 @@ export const activityDetailInclude = {
       passengers: { include: { user: { select: { id: true, name: true } } } },
     },
   },
+  images: { orderBy: { createdAt: "asc" } },
 } satisfies Prisma.ActivityInclude
 
 export type ActivityDetail = Prisma.ActivityGetPayload<{

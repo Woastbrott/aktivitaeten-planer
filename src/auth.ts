@@ -12,19 +12,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        email: { label: "E-Mail", type: "email" },
+        username: { label: "Nutzername", type: "text" },
         password: { label: "Passwort", type: "password" },
       },
       authorize: async (credentials) => {
-        const email = credentials?.email
+        const username = credentials?.username
         const password = credentials?.password
 
-        if (typeof email !== "string" || typeof password !== "string") {
+        if (typeof username !== "string" || typeof password !== "string") {
           return null
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() },
+          where: { username: username.trim().toLowerCase() },
         })
 
         if (!user) return null
@@ -32,7 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const isValid = await bcrypt.compare(password, user.passwordHash)
         if (!isValid) return null
 
-        return { id: user.id, name: user.name, email: user.email }
+        return { id: user.id, name: user.name, username: user.username }
       },
     }),
   ],
@@ -40,12 +40,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     jwt: async ({ token, user }) => {
       if (user?.id) {
         token.id = user.id
+        token.username = user.username
       }
       return token
     },
     session: async ({ session, token }) => {
       if (session.user && token.id) {
         session.user.id = token.id as string
+        session.user.username = token.username as string
       }
       return session
     },

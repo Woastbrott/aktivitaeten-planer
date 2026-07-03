@@ -7,7 +7,6 @@ import { CalendarDays, MapPin, Users } from "lucide-react"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { activityDetailInclude } from "@/lib/types"
-import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import {
   Tabs,
@@ -15,13 +14,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { CATEGORY_ICONS, CATEGORY_LABELS, CATEGORY_STYLES } from "@/lib/categories"
 import { ParticipationControls } from "@/components/activities/participation-controls"
 import { ParticipantList } from "@/components/activities/participant-list"
 import { WeatherWidget } from "@/components/activities/weather-widget"
 import { CommentsSection } from "@/components/activities/comments-section"
 import { ExpensesSection } from "@/components/activities/expenses-section"
 import { CarpoolSection } from "@/components/activities/carpool-section"
+import { ImageGallery } from "@/components/activities/image-gallery"
 
 export async function generateMetadata({
   params,
@@ -52,7 +51,6 @@ export default async function ActivityDetailPage({
 
   if (!activity) notFound()
 
-  const Icon = CATEGORY_ICONS[activity.category]
   const currentParticipation =
     activity.participations.find((p) => p.userId === userId) ?? null
   const goingParticipants = activity.participations
@@ -62,13 +60,7 @@ export default async function ActivityDetailPage({
   return (
     <div className="mx-auto grid max-w-3xl gap-6">
       <div className="grid gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <Badge
-            className={`gap-1 border-none font-medium ${CATEGORY_STYLES[activity.category]}`}
-          >
-            <Icon className="size-3.5" />
-            {CATEGORY_LABELS[activity.category]}
-          </Badge>
+        <div className="flex justify-end">
           <span className="text-xs text-muted-foreground">
             vorgeschlagen von {activity.createdBy.name}
           </span>
@@ -101,11 +93,16 @@ export default async function ActivityDetailPage({
           )}
           <div className="flex items-center gap-1.5">
             <Users className="size-4 shrink-0" />
-            {goingParticipants.length}
-            {activity.capacity ? ` / ${activity.capacity}` : ""} dabei
+            {goingParticipants.length} dabei
           </div>
         </div>
       </div>
+
+      <ImageGallery
+        activityId={activity.id}
+        images={activity.images}
+        canManage={userId === activity.createdById}
+      />
 
       {activity.weatherRelevant && (
         <WeatherWidget lat={activity.lat} lng={activity.lng} date={activity.date} />
@@ -120,10 +117,7 @@ export default async function ActivityDetailPage({
       </Card>
 
       <Card className="p-4">
-        <ParticipantList
-          participations={activity.participations}
-          capacity={activity.capacity}
-        />
+        <ParticipantList participations={activity.participations} />
       </Card>
 
       <Tabs defaultValue="comments">

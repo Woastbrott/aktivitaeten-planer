@@ -7,6 +7,7 @@ import type { ParticipationStatus } from "@prisma/client"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { activitySchema } from "@/lib/validations"
+import { saveActivityImages } from "@/lib/uploads"
 
 export type ActivityFormState = {
   error?: string
@@ -22,18 +23,15 @@ export async function createActivity(
 
   const rawLat = formData.get("lat")
   const rawLng = formData.get("lng")
-  const rawCapacity = formData.get("capacity")
   const rawDate = formData.get("date")
 
   const parsed = activitySchema.safeParse({
     title: formData.get("title"),
     description: formData.get("description") || "",
-    category: formData.get("category"),
     location: formData.get("location") || "",
     lat: rawLat ? Number(rawLat) : null,
     lng: rawLng ? Number(rawLng) : null,
     date: rawDate || null,
-    capacity: rawCapacity ? Number(rawCapacity) : null,
     weatherRelevant: formData.get("weatherRelevant") === "on",
   })
 
@@ -54,6 +52,13 @@ export async function createActivity(
     },
   })
 
+  const imageFiles = formData.getAll("images").filter(
+    (entry): entry is File => entry instanceof File && entry.size > 0
+  )
+  if (imageFiles.length > 0) {
+    await saveActivityImages(activity.id, imageFiles)
+  }
+
   revalidatePath("/activities")
   redirect(`/activities/${activity.id}`)
 }
@@ -64,30 +69,6 @@ export async function setParticipation(
 ) {
   const session = await auth()
   if (!session?.user?.id) throw new Error("Nicht eingeloggt.")
-
-  if (status === "GOING") {
-    const activity = await prisma.activity.findUnique({
-      where: { id: activityId },
-      select: {
-        capacity: true,
-        participations: { where: { status: "GOING" }, select: { userId: true } },
-      },
-    })
-
-    if (!activity) throw new Error("Aktivität nicht gefunden.")
-
-    const alreadyGoing = activity.participations.some(
-      (p) => p.userId === session.user.id
-    )
-
-    if (
-      activity.capacity &&
-      !alreadyGoing &&
-      activity.participations.length >= activity.capacity
-    ) {
-      throw new Error("Keine Plätze mehr frei.")
-    }
-  }
 
   await prisma.participation.upsert({
     where: {

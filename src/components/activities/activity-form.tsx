@@ -1,22 +1,14 @@
 "use client"
 
 import { useActionState, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { ImagePlus, Loader2 } from "lucide-react"
 
 import { createActivity, type ActivityFormState } from "@/lib/actions/activities"
-import { CATEGORY_LABELS, CATEGORY_OPTIONS } from "@/lib/categories"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { LocationSearch } from "@/components/activities/location-search"
 
 const initialState: ActivityFormState = {}
@@ -63,40 +55,6 @@ export function ActivityForm() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-2">
-          <Label htmlFor="category">Kategorie</Label>
-          <Select name="category" defaultValue="SONSTIGES" required>
-            <SelectTrigger id="category" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORY_OPTIONS.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {CATEGORY_LABELS[cat]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="capacity">Teilnehmer-Limit (optional)</Label>
-          <Input
-            id="capacity"
-            name="capacity"
-            type="number"
-            min={1}
-            placeholder="z. B. 10"
-          />
-          {state.fieldErrors?.capacity && (
-            <p className="text-sm text-destructive">
-              {state.fieldErrors.capacity[0]}
-            </p>
-          )}
-        </div>
-      </div>
-
       <div className="grid gap-2">
         <Label>Ort</Label>
         <LocationSearch
@@ -133,6 +91,23 @@ export function ActivityForm() {
           </p>
         </div>
         <Switch id="weatherRelevant" name="weatherRelevant" />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="images" className="flex items-center gap-1.5">
+          <ImagePlus className="size-4" />
+          Bilder (optional)
+        </Label>
+        <Input
+          id="images"
+          name="images"
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp,image/gif"
+        />
+        <p className="text-xs text-muted-foreground">
+          JPEG, PNG, WebP oder GIF, bis 5 MB pro Bild, max. 8 Bilder.
+        </p>
       </div>
 
       <Button type="submit" disabled={isPending} size="lg">

@@ -18,7 +18,7 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader
-        user={{ name: session.user.name ?? "", email: session.user.email ?? "" }}
+        user={{ name: session.user.name ?? "", username: session.user.username }}
         pendingCount={pendingCount}
       />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 md:pb-10">

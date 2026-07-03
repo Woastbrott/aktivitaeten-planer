@@ -17,7 +17,7 @@ export async function registerUser(
 ): Promise<RegisterState> {
   const parsed = registerSchema.safeParse({
     name: formData.get("name"),
-    email: formData.get("email"),
+    username: formData.get("username"),
     password: formData.get("password"),
     inviteToken: formData.get("inviteToken") || undefined,
   })
@@ -26,17 +26,17 @@ export async function registerUser(
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
-  const { name, email, password } = parsed.data
+  const { name, username, password } = parsed.data
 
-  const existing = await prisma.user.findUnique({ where: { email } })
+  const existing = await prisma.user.findUnique({ where: { username } })
   if (existing) {
-    return { error: "Diese E-Mail-Adresse ist bereits registriert." }
+    return { error: "Dieser Nutzername ist bereits vergeben." }
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
 
   await prisma.user.create({
-    data: { name, email, passwordHash },
+    data: { name, username, passwordHash },
   })
 
   return { success: true }

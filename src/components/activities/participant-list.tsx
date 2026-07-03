@@ -10,10 +10,8 @@ const GROUPS: { status: "GOING" | "MAYBE" | "DECLINED"; label: string }[] = [
 
 export function ParticipantList({
   participations,
-  capacity,
 }: {
   participations: ActivityDetail["participations"]
-  capacity: number | null
 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-3">
@@ -22,8 +20,7 @@ export function ParticipantList({
         return (
           <div key={group.status} className="grid gap-2">
             <p className="text-xs font-medium text-muted-foreground">
-              {group.label} ({people.length}
-              {group.status === "GOING" && capacity ? ` / ${capacity}` : ""})
+              {group.label} ({people.length})
             </p>
             {people.length === 0 ? (
               <p className="text-sm text-muted-foreground/70">–</p>

@@ -9,7 +9,7 @@ export function SiteHeader({
   user,
   pendingCount,
 }: {
-  user: { name: string; email: string }
+  user: { name: string; username: string }
   pendingCount: number
 }) {
   return (
@@ -29,7 +29,7 @@ export function SiteHeader({
 
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <UserMenu name={user.name} email={user.email} />
+          <UserMenu name={user.name} username={user.username} />
         </div>
       </div>
     </header>

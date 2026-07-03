@@ -17,10 +17,10 @@ import { initials } from "@/lib/initials"
 
 export function UserMenu({
   name,
-  email,
+  username,
 }: {
   name: string
-  email: string
+  username: string
 }) {
   return (
     <DropdownMenu>
@@ -41,7 +41,7 @@ export function UserMenu({
         <DropdownMenuLabel className="grid gap-0.5">
           <span className="font-medium">{name}</span>
           <span className="text-xs font-normal text-muted-foreground">
-            {email}
+            @{username}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

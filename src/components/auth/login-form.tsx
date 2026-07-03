@@ -22,7 +22,7 @@ export function LoginForm() {
 
     const formData = new FormData(e.currentTarget)
     const result = await signIn("credentials", {
-      email: formData.get("email"),
+      username: formData.get("username"),
       password: formData.get("password"),
       redirect: false,
     })
@@ -30,7 +30,7 @@ export function LoginForm() {
     setIsPending(false)
 
     if (result?.error) {
-      setError("E-Mail oder Passwort ist falsch.")
+      setError("Nutzername oder Passwort ist falsch.")
       return
     }
 
@@ -48,12 +48,13 @@ export function LoginForm() {
       )}
 
       <div className="grid gap-2">
-        <Label htmlFor="email">E-Mail</Label>
+        <Label htmlFor="username">Nutzername</Label>
         <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="du@beispiel.de"
+          id="username"
+          name="username"
+          placeholder="dein-name"
+          autoCapitalize="none"
+          autoCorrect="off"
           required
         />
       </div>

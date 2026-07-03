@@ -7,7 +7,7 @@ Eine private Web-App für eine feste Freundesgruppe, um Sommer-Aktivitäten vorz
 - [Next.js](https://nextjs.org) (App Router, TypeScript)
 - [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)
 - [Prisma](https://www.prisma.io) mit SQLite
-- [Auth.js (NextAuth)](https://authjs.dev) mit Credentials-Provider (E-Mail + Passwort, bcrypt-Hashing)
+- [Auth.js (NextAuth)](https://authjs.dev) mit Credentials-Provider (Nutzername + Passwort, bcrypt-Hashing)
 - [Open-Meteo](https://open-meteo.com) für Wetter- und Geocoding-Daten (kein API-Key nötig)
 
 ## Setup
@@ -40,15 +40,15 @@ npx prisma migrate dev
 npx prisma db seed
 ```
 
-Das Seed-Skript legt 5 Beispiel-User sowie 4 Beispiel-Aktivitäten an (u. a. eine wetterrelevante Aktivität, eine mit Ausgaben und eine mit Fahrgemeinschaft).
+Das Seed-Skript legt 5 Beispiel-User an (keine Beispiel-Aktivitäten – die App startet mit einer leeren Aktivitätenliste).
 
 **Login-Daten der Beispiel-User** (Passwort für alle: `password123`):
 
-- anna@example.com
-- ben@example.com
-- clara@example.com
-- david@example.com
-- elif@example.com
+- anna
+- ben
+- clara
+- david
+- elif
 
 Ein Beispiel-Einladungslink ist unter `/invite/demo-invite-token` erreichbar.
 
@@ -75,10 +75,17 @@ Um die Datenbank komplett zurückzusetzen (löscht alle Daten und führt Migrati
 npx prisma migrate reset
 ```
 
+## Bild-Uploads
+
+Bilder zu Aktivitäten werden lokal unter `public/uploads/activities/<activityId>/` gespeichert (der Ordner wird beim ersten Upload automatisch angelegt) und dort direkt von Next.js ausgeliefert. Das setzt ein **persistentes, beschreibbares Dateisystem** voraus – lokal oder bei Self-Hosting funktioniert das ohne weitere Konfiguration, für serverlose Deployments (z. B. Vercel) wäre stattdessen ein externer Objektspeicher nötig.
+
+Zulässig sind JPEG, PNG, WebP und GIF bis 5 MB pro Datei, maximal 8 Bilder pro Aktivität. Nur die Person, die eine Aktivität erstellt hat, kann Bilder hinzufügen oder entfernen.
+
 ## Funktionsumfang
 
-- **Accounts**: Registrierung, Login, Beitritt über Einladungslink
-- **Aktivitäten**: Vorschlagen, Kalender- und Listenansicht, Filter nach Kategorie/eigenen Aktivitäten, Teilnahmestatus (Dabei/Vielleicht/Abgesagt), Kommentare
+- **Accounts**: Registrierung, Login (Nutzername + Passwort), Beitritt über Einladungslink
+- **Aktivitäten**: Vorschlagen (inkl. Bilder), Kalender- und Listenansicht, Filter nach eigenen Aktivitäten, Teilnahmestatus (Dabei/Vielleicht/Abgesagt) ohne Teilnehmerlimit, Kommentare
+- **Bilder**: Upload beim Erstellen und nachträglich auf der Detailseite, Galerie-Ansicht, Titelbild auf der Aktivitäts-Card
 - **Kosten**: Ausgaben pro Aktivität erfassen, automatische Aufteilung auf Teilnehmer, vereinfachter Schuldenausgleich
 - **Fahrgemeinschaften**: Anbieten, beitreten, Übersicht wer noch eine Mitfahrgelegenheit braucht
 - **Wetter**: Vorhersage für wetterrelevante Outdoor-Aktivitäten (bis 15 Tage im Voraus, sofern Ort und Datum feststehen)
