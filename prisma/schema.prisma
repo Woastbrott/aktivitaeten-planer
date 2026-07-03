@@ -1,0 +1,134 @@
+// Prisma schema for the Sommer-Aktivitäten-Planer
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ParticipationStatus {
+  GOING
+  MAYBE
+  DECLINED
+}
+
+enum ActivityCategory {
+  WANDERN
+  BADEN
+  GRILLEN
+  FESTIVAL
+  SPORT
+  KULTUR
+  SONSTIGES
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  createdActivities Activity[]         @relation("ActivityCreator")
+  participations    Participation[]
+  comments          Comment[]
+  expensesPaid      Expense[]
+  carpoolsDriven    Carpool[]
+  carpoolRides      CarpoolPassenger[]
+  invitesCreated    Invite[]
+}
+
+model Activity {
+  id              String            @id @default(cuid())
+  title           String
+  description     String
+  category        ActivityCategory
+  location        String
+  lat             Float?
+  lng             Float?
+  date            DateTime?
+  capacity        Int?
+  weatherRelevant Boolean           @default(false)
+  createdById     String
+  createdBy       User              @relation("ActivityCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime          @default(now())
+
+  participations Participation[]
+  comments       Comment[]
+  expenses       Expense[]
+  carpools       Carpool[]
+
+  @@index([date])
+}
+
+model Participation {
+  id         String              @id @default(cuid())
+  userId     String
+  activityId String
+  status     ParticipationStatus
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity   Activity            @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  createdAt  DateTime            @default(now())
+
+  @@unique([userId, activityId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  activityId String
+  userId     String
+  text       String
+  createdAt  DateTime @default(now())
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id         String   @id @default(cuid())
+  activityId String
+  title      String
+  amount     Int // Cent
+  paidById   String
+  createdAt  DateTime @default(now())
+
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  paidBy   User     @relation(fields: [paidById], references: [id], onDelete: Cascade)
+}
+
+model Carpool {
+  id                String   @id @default(cuid())
+  activityId        String
+  driverId          String
+  seats             Int
+  departureLocation String
+  departureTime     DateTime
+
+  activity   Activity           @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  driver     User               @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  passengers CarpoolPassenger[]
+}
+
+model CarpoolPassenger {
+  id        String @id @default(cuid())
+  carpoolId String
+  userId    String
+
+  carpool Carpool @relation(fields: [carpoolId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([carpoolId, userId])
+}
+
+model Invite {
+  id          String    @id @default(cuid())
+  token       String    @unique
+  createdById String
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime?
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}
