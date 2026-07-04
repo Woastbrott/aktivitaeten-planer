@@ -7,7 +7,7 @@ import type { ParticipationStatus } from "@prisma/client"
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { activitySchema } from "@/lib/validations"
-import { saveActivityImages } from "@/lib/uploads"
+import { saveActivityImages, deleteActivityImageFile } from "@/lib/uploads"
 
 export type ActivityFormState = {
   error?: string
@@ -86,4 +86,26 @@ export async function setParticipation(
 
   revalidatePath(`/activities/${activityId}`)
   revalidatePath("/activities")
+}
+
+export async function deleteActivity(activityId: string) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error("Nicht eingeloggt.")
+
+  const activity = await prisma.activity.findUnique({
+    where: { id: activityId },
+    select: { createdById: true, images: { select: { path: true } } },
+  })
+  if (!activity) throw new Error("Aktivität nicht gefunden.")
+  if (activity.createdById !== session.user.id) {
+    throw new Error("Nur die erstellende Person kann die Aktivität löschen.")
+  }
+
+  await Promise.all(
+    activity.images.map((image) => deleteActivityImageFile(image.path))
+  )
+  await prisma.activity.delete({ where: { id: activityId } })
+
+  revalidatePath("/activities")
+  redirect("/activities")
 }

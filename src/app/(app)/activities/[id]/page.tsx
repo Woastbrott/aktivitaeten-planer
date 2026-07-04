@@ -23,6 +23,7 @@ import { ExpensesSection } from "@/components/activities/expenses-section"
 import { CarpoolSection } from "@/components/activities/carpool-section"
 import { ImageGallery } from "@/components/activities/image-gallery"
 import { FlashErrorToast } from "@/components/activities/flash-error-toast"
+import { DeleteActivityButton } from "@/components/activities/delete-activity-button"
 import { BrainrotText } from "@/components/brainrot-text"
 
 export async function generateMetadata({
@@ -68,10 +69,16 @@ export default async function ActivityDetailPage({
       {imageError && <FlashErrorToast message={imageError} />}
 
       <div className="grid gap-3">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-2">
           <span className="text-xs text-muted-foreground">
             vorgeschlagen von {activity.createdBy.name}
           </span>
+          {userId === activity.createdById && (
+            <DeleteActivityButton
+              activityId={activity.id}
+              activityTitle={activity.title}
+            />
+          )}
         </div>
 
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
