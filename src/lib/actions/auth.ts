@@ -26,7 +26,19 @@ export async function registerUser(
     return { fieldErrors: parsed.error.flatten().fieldErrors }
   }
 
-  const { name, username, password } = parsed.data
+  const { name, username, password, inviteToken } = parsed.data
+
+  if (!inviteToken) {
+    return {
+      error:
+        "Für die Registrierung wird ein Einladungslink benötigt. Frag ein bestehendes Mitglied nach einer Einladung.",
+    }
+  }
+
+  const invite = await prisma.invite.findUnique({ where: { token: inviteToken } })
+  if (!invite || (invite.expiresAt && invite.expiresAt < new Date())) {
+    return { error: "Dieser Einladungslink ist ungültig oder abgelaufen." }
+  }
 
   const existing = await prisma.user.findUnique({ where: { username } })
   if (existing) {

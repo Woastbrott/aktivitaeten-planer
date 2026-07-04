@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ActivityCard } from "@/components/activities/activity-card"
 import { ActivityFilters } from "@/components/activities/activity-filters"
 import { EmptyState } from "@/components/empty-state"
+import { BrainrotText } from "@/components/brainrot-text"
 
 export const metadata: Metadata = { title: "Aktivitäten – Sommer-Planer" }
 
@@ -38,7 +39,9 @@ export default async function ActivitiesPage({
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="grid gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Aktivitäten</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            <BrainrotText>Aktivitäten</BrainrotText>
+          </h1>
           <p className="text-sm text-muted-foreground">
             {activities.length} Aktivität{activities.length === 1 ? "" : "en"}
           </p>
@@ -52,7 +55,7 @@ export default async function ActivitiesPage({
           <Button asChild>
             <Link href="/activities/new">
               <Plus />
-              Neue Aktivität
+              <BrainrotText>Neue Aktivität</BrainrotText>
             </Link>
           </Button>
         </div>
@@ -72,8 +75,14 @@ export default async function ActivitiesPage({
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {activities.map((activity) => (
-            <ActivityCard key={activity.id} activity={activity} />
+          {activities.map((activity, index) => (
+            <div
+              key={activity.id}
+              className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-500"
+              style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
+            >
+              <ActivityCard activity={activity} />
+            </div>
           ))}
         </div>
       )}

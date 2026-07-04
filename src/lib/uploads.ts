@@ -1,5 +1,4 @@
-import { mkdir, unlink, writeFile } from "fs/promises"
-import path from "path"
+import { put, del } from "@vercel/blob"
 import { randomUUID } from "crypto"
 
 import { prisma } from "@/lib/prisma"
@@ -31,15 +30,15 @@ function validateImageFile(file: File): string | null {
 }
 
 async function writeImageFile(activityId: string, file: File): Promise<string> {
-  const dir = path.join(process.cwd(), "public", "uploads", "activities", activityId)
-  await mkdir(dir, { recursive: true })
-
   const extension = EXTENSION_BY_TYPE[file.type] ?? "jpg"
   const filename = `${randomUUID()}.${extension}`
-  const buffer = Buffer.from(await file.arrayBuffer())
-  await writeFile(path.join(dir, filename), buffer)
 
-  return `/uploads/activities/${activityId}/${filename}`
+  const blob = await put(`activities/${activityId}/${filename}`, file, {
+    access: "public",
+    addRandomSuffix: false,
+  })
+
+  return blob.url
 }
 
 /**
@@ -79,6 +78,5 @@ export async function saveActivityImages(
 }
 
 export async function deleteActivityImageFile(imagePath: string): Promise<void> {
-  const absolutePath = path.join(process.cwd(), "public", imagePath)
-  await unlink(absolutePath).catch(() => {})
+  await del(imagePath).catch(() => {})
 }

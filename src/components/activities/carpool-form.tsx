@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react"
 import { Loader2, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import { createCarpool, type CarpoolFormState } from "@/lib/actions/carpools"
 import { Button } from "@/components/ui/button"
@@ -34,6 +35,7 @@ export function CarpoolForm({ activityId }: { activityId: string }) {
         setState({})
         form.reset()
         setOpen(false)
+        toast.success("Fahrgemeinschaft angeboten.")
       }
     })
   }

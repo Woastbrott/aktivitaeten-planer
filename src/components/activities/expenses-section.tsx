@@ -37,6 +37,7 @@ export function ExpensesSection({
     startTransition(async () => {
       try {
         await deleteExpense(activityId, expenseId)
+        toast.success("Ausgabe gelöscht.")
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Ausgabe konnte nicht gelöscht werden."
@@ -71,7 +72,7 @@ export function ExpensesSection({
             {expenses.map((expense) => (
               <li
                 key={expense.id}
-                className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm"
+                className="flex animate-in fade-in slide-in-from-bottom-1 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm duration-300 transition-colors hover:bg-muted/40"
               >
                 <div className="grid gap-0.5">
                   <span className="font-medium">{expense.title}</span>

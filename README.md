@@ -6,7 +6,7 @@ Eine private Web-App für eine feste Freundesgruppe, um Sommer-Aktivitäten vorz
 
 - [Next.js](https://nextjs.org) (App Router, TypeScript)
 - [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com)
-- [Prisma](https://www.prisma.io) mit SQLite
+- [Prisma](https://www.prisma.io) mit Postgres (Prisma Postgres via Vercel Marketplace)
 - [Auth.js (NextAuth)](https://authjs.dev) mit Credentials-Provider (Nutzername + Passwort, bcrypt-Hashing)
 - [Open-Meteo](https://open-meteo.com) für Wetter- und Geocoding-Daten (kein API-Key nötig)
 
@@ -20,14 +20,14 @@ npm install
 
 ### 2. Umgebungsvariablen
 
-Die Datei `.env` ist bereits mit funktionierenden Entwicklungswerten vorhanden:
+Die Datei `.env` ist bereits mit funktionierenden Werten vorhanden (Prisma Postgres via Vercel Marketplace):
 
 ```bash
-DATABASE_URL="file:./dev.db"
-AUTH_SECRET="dev-only-secret-change-me-in-production-0123456789"
+DATABASE_URL="postgres://...@db.prisma.io:5432/postgres?sslmode=require"
+AUTH_SECRET="..."
 ```
 
-Für einen produktiven Einsatz sollte `AUTH_SECRET` durch einen zufälligen Wert ersetzt werden, z. B. mit:
+`vercel env pull` holt die aktuellen Werte (inkl. `DATABASE_URL`) direkt aus dem verknüpften Vercel-Projekt. Für einen neuen `AUTH_SECRET` (z. B. bei einer eigenen DB-Instanz):
 
 ```bash
 npx auth secret
@@ -77,7 +77,7 @@ npx prisma migrate reset
 
 ## Bild-Uploads
 
-Bilder zu Aktivitäten werden lokal unter `public/uploads/activities/<activityId>/` gespeichert (der Ordner wird beim ersten Upload automatisch angelegt) und dort direkt von Next.js ausgeliefert. Das setzt ein **persistentes, beschreibbares Dateisystem** voraus – lokal oder bei Self-Hosting funktioniert das ohne weitere Konfiguration, für serverlose Deployments (z. B. Vercel) wäre stattdessen ein externer Objektspeicher nötig.
+Bilder zu Aktivitäten werden in [Vercel Blob](https://vercel.com/docs/vercel-blob) gespeichert (öffentlicher Store, verknüpft über `BLOB_READ_WRITE_TOKEN`). Das funktioniert sowohl lokal als auch auf Vercel, ohne ein beschreibbares lokales Dateisystem vorauszusetzen.
 
 Zulässig sind JPEG, PNG, WebP und GIF bis 5 MB pro Datei, maximal 8 Bilder pro Aktivität. Nur die Person, die eine Aktivität erstellt hat, kann Bilder hinzufügen oder entfernen.
 

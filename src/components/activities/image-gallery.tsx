@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useRef, useTransition } from "react"
+import { useActionState, useEffect, useRef, useTransition } from "react"
 import Image from "next/image"
 import { ImagePlus, Loader2, Trash2 } from "lucide-react"
 import { toast } from "sonner"
@@ -30,11 +30,20 @@ export function ImageGallery({
   )
   const formRef = useRef<HTMLFormElement>(null)
   const [isDeleting, startTransition] = useTransition()
+  const wasUploading = useRef(false)
+
+  useEffect(() => {
+    if (wasUploading.current && !isUploading && !state.error) {
+      toast.success("Bild(er) hochgeladen.")
+    }
+    wasUploading.current = isUploading
+  }, [isUploading, state.error])
 
   function handleDelete(imageId: string) {
     startTransition(async () => {
       try {
         await deleteActivityImage(activityId, imageId)
+        toast.success("Bild gelöscht.")
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Bild konnte nicht gelöscht werden."

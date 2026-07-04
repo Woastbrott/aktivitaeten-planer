@@ -11,7 +11,8 @@ export default function RegisterPage() {
       <div className="grid gap-1.5 text-center">
         <h1 className="text-xl font-semibold tracking-tight">Konto erstellen</h1>
         <p className="text-sm text-muted-foreground">
-          Werde Teil der Gruppe und plane Sommer-Aktivitäten mit.
+          Du brauchst einen Einladungslink von einem bestehenden Mitglied, um
+          dich zu registrieren.
         </p>
       </div>
 

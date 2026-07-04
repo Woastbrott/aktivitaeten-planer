@@ -56,6 +56,14 @@ export function LocationSearch({
             setResults([])
             setSearched(false)
           }}
+          onKeyDown={(e) => {
+            // Prevent Enter from submitting the surrounding activity form —
+            // it should trigger the location search instead.
+            if (e.key === "Enter") {
+              e.preventDefault()
+              handleSearch()
+            }
+          }}
         />
         <Button
           type="button"

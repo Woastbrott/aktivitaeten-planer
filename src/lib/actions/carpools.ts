@@ -56,26 +56,33 @@ export async function createCarpool(
 export async function joinCarpool(activityId: string, carpoolId: string) {
   const session = await auth()
   if (!session?.user?.id) throw new Error("Nicht eingeloggt.")
+  const userId = session.user.id
 
-  const carpool = await prisma.carpool.findUnique({
-    where: { id: carpoolId },
-    include: { passengers: true },
-  })
-  if (!carpool) throw new Error("Fahrgemeinschaft nicht gefunden.")
-  if (carpool.driverId === session.user.id) {
-    throw new Error("Du bist bereits Fahrer:in dieser Fahrgemeinschaft.")
-  }
-  if (carpool.passengers.length >= carpool.seats) {
-    throw new Error("Keine Plätze mehr frei.")
-  }
+  // Wrapped in a transaction with a fresh capacity check right before the
+  // insert, so two people clicking "Mitfahren" on the last seat at the same
+  // time can't both get in (the earlier check-then-upsert was racy).
+  await prisma.$transaction(async (tx) => {
+    const carpool = await tx.carpool.findUnique({
+      where: { id: carpoolId },
+      include: { passengers: true },
+    })
+    if (!carpool) throw new Error("Fahrgemeinschaft nicht gefunden.")
+    if (carpool.driverId === userId) {
+      throw new Error("Du bist bereits Fahrer:in dieser Fahrgemeinschaft.")
+    }
+    const alreadyIn = carpool.passengers.some((p) => p.userId === userId)
+    if (!alreadyIn && carpool.passengers.length >= carpool.seats) {
+      throw new Error("Keine Plätze mehr frei.")
+    }
 
-  await prisma.carpoolPassenger.upsert({
-    where: {
-      carpoolId_userId: { carpoolId, userId: session.user.id },
-    },
-    create: { carpoolId, userId: session.user.id },
-    update: {},
-  })
+    await tx.carpoolPassenger.upsert({
+      where: {
+        carpoolId_userId: { carpoolId, userId },
+      },
+      create: { carpoolId, userId },
+      update: {},
+    })
+  }, { isolationLevel: "Serializable" })
 
   revalidatePath(`/activities/${activityId}`)
 }

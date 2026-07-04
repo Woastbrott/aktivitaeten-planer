@@ -35,10 +35,11 @@ export function CarpoolSection({
   }
   const needsRide = goingParticipants.filter((p) => !assignedIds.has(p.id))
 
-  function run(action: () => Promise<void>) {
+  function run(action: () => Promise<void>, successMessage?: string) {
     startTransition(async () => {
       try {
         await action()
+        if (successMessage) toast.success(successMessage)
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Etwas ist schiefgelaufen."
@@ -71,7 +72,10 @@ export function CarpoolSection({
             const full = carpool.passengers.length >= carpool.seats
 
             return (
-              <li key={carpool.id} className="grid gap-2.5 rounded-lg border p-3.5">
+              <li
+                key={carpool.id}
+                className="grid animate-in fade-in slide-in-from-bottom-1 gap-2.5 rounded-lg border p-3.5 duration-300"
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Avatar className="size-8">
@@ -97,7 +101,10 @@ export function CarpoolSection({
                       size="icon-sm"
                       disabled={isPending}
                       onClick={() =>
-                        run(() => deleteCarpool(activityId, carpool.id))
+                        run(
+                          () => deleteCarpool(activityId, carpool.id),
+                          "Fahrgemeinschaft gelöscht."
+                        )
                       }
                       aria-label="Fahrgemeinschaft löschen"
                     >
@@ -135,10 +142,14 @@ export function CarpoolSection({
                     size="sm"
                     disabled={isPending || (!isPassenger && full)}
                     onClick={() =>
-                      run(() =>
+                      run(
+                        () =>
+                          isPassenger
+                            ? leaveCarpool(activityId, carpool.id)
+                            : joinCarpool(activityId, carpool.id),
                         isPassenger
-                          ? leaveCarpool(activityId, carpool.id)
-                          : joinCarpool(activityId, carpool.id)
+                          ? "Mitfahrt storniert."
+                          : "Mitfahrt bestätigt."
                       )
                     }
                   >

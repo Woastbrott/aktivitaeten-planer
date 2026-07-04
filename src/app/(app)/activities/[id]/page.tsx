@@ -22,6 +22,8 @@ import { CommentsSection } from "@/components/activities/comments-section"
 import { ExpensesSection } from "@/components/activities/expenses-section"
 import { CarpoolSection } from "@/components/activities/carpool-section"
 import { ImageGallery } from "@/components/activities/image-gallery"
+import { FlashErrorToast } from "@/components/activities/flash-error-toast"
+import { BrainrotText } from "@/components/brainrot-text"
 
 export async function generateMetadata({
   params,
@@ -38,10 +40,13 @@ export async function generateMetadata({
 
 export default async function ActivityDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ imageError?: string }>
 }) {
   const { id } = await params
+  const { imageError } = await searchParams
   const session = await auth()
   const userId = session!.user.id
 
@@ -60,6 +65,8 @@ export default async function ActivityDetailPage({
 
   return (
     <div className="mx-auto grid max-w-3xl gap-6">
+      {imageError && <FlashErrorToast message={imageError} />}
+
       <div className="grid gap-3">
         <div className="flex justify-end">
           <span className="text-xs text-muted-foreground">
@@ -119,7 +126,9 @@ export default async function ActivityDetailPage({
       )}
 
       <Card className="grid gap-3 p-4">
-        <p className="text-sm font-medium">Bist du dabei?</p>
+        <p className="text-sm font-medium">
+          <BrainrotText>Bist du dabei?</BrainrotText>
+        </p>
         <ParticipationControls
           activityId={activity.id}
           currentStatus={currentParticipation?.status ?? null}
@@ -137,7 +146,11 @@ export default async function ActivityDetailPage({
           <TabsTrigger value="carpool">Fahrgemeinschaft</TabsTrigger>
         </TabsList>
         <TabsContent value="comments" className="pt-4">
-          <CommentsSection activityId={activity.id} comments={activity.comments} />
+          <CommentsSection
+            activityId={activity.id}
+            comments={activity.comments}
+            currentUserName={session!.user.name || session!.user.username}
+          />
         </TabsContent>
         <TabsContent value="expenses" className="pt-4">
           <ExpensesSection

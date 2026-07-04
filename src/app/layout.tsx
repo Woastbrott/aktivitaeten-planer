@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { BrainrotProvider } from "@/components/brainrot-provider"
+import { BrainrotFx } from "@/components/brainrot-fx"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -37,8 +39,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
+          <BrainrotProvider>
+            <BrainrotFx />
+            {children}
+            <Toaster />
+          </BrainrotProvider>
         </ThemeProvider>
       </body>
     </html>

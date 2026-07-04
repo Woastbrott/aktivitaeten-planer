@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react"
 import { Loader2, Pencil, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import {
   addExpense,
@@ -55,6 +56,7 @@ export function ExpenseForm({ activityId, participants, expense }: ExpenseFormPr
         setState({})
         form.reset()
         setOpen(false)
+        toast.success(isEdit ? "Ausgabe aktualisiert." : "Ausgabe hinzugefügt.")
       }
     })
   }

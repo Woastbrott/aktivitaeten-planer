@@ -55,12 +55,18 @@ export async function createActivity(
   const imageFiles = formData.getAll("images").filter(
     (entry): entry is File => entry instanceof File && entry.size > 0
   )
+  let imageErrors: string[] = []
   if (imageFiles.length > 0) {
-    await saveActivityImages(activity.id, imageFiles)
+    const result = await saveActivityImages(activity.id, imageFiles)
+    imageErrors = result.errors
   }
 
   revalidatePath("/activities")
-  redirect(`/activities/${activity.id}`)
+  redirect(
+    imageErrors.length > 0
+      ? `/activities/${activity.id}?imageError=${encodeURIComponent(imageErrors.join(" "))}`
+      : `/activities/${activity.id}`
+  )
 }
 
 export async function setParticipation(

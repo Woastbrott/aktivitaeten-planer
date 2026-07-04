@@ -128,3 +128,111 @@
     @apply font-sans;
   }
 }
+
+/* Brainrot mode — purely cosmetic chaos layered on top of the normal UI.
+   Nothing here changes markup, form fields, or data; only how it looks. */
+
+@keyframes brainrot-bg-spin {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes brainrot-rainbow-text {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes brainrot-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-40px) rotate(15deg);
+  }
+}
+
+@keyframes brainrot-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes brainrot-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-3deg) scale(1.04);
+  }
+  75% {
+    transform: rotate(3deg) scale(1.04);
+  }
+}
+
+.brainrot body {
+  background: linear-gradient(
+    90deg,
+    oklch(0.75 0.18 30),
+    oklch(0.8 0.18 100),
+    oklch(0.75 0.18 160),
+    oklch(0.75 0.18 260),
+    oklch(0.75 0.18 330),
+    oklch(0.75 0.18 30)
+  );
+  background-size: 300% 100%;
+  animation: brainrot-bg-spin 12s linear infinite;
+}
+
+.brainrot h1,
+.brainrot h2 {
+  font-family: "Comic Sans MS", "Comic Neue", cursive;
+  filter: hue-rotate(0deg);
+  animation: brainrot-rainbow-text 4s linear infinite;
+}
+
+.brainrot .rounded-2xl,
+.brainrot .rounded-xl {
+  animation-duration: 0.01s; /* keep existing entrance anims snappy under chaos */
+}
+
+.brainrot button:hover,
+.brainrot a:hover {
+  animation: brainrot-wiggle 0.4s ease-in-out;
+}
+
+.brainrot-float {
+  top: -60px;
+  animation-name: brainrot-float;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.brainrot-ticker {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 60;
+  height: 1.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  background: oklch(0.2 0.02 250 / 85%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  display: flex;
+}
+
+.brainrot-ticker span {
+  display: inline-block;
+  padding-inline-end: 2rem;
+  animation: brainrot-marquee 22s linear infinite;
+}

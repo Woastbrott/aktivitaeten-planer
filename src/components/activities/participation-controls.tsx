@@ -1,12 +1,14 @@
 "use client"
 
-import { useTransition } from "react"
-import { Check, HelpCircle, Loader2, X } from "lucide-react"
+import { useOptimistic, useTransition } from "react"
+import { Check, HelpCircle, X } from "lucide-react"
 import { toast } from "sonner"
 import type { ParticipationStatus } from "@prisma/client"
 
 import { setParticipation } from "@/lib/actions/activities"
 import { Button } from "@/components/ui/button"
+import { useBrainrot } from "@/components/brainrot-provider"
+import { brainrotLabel } from "@/lib/brainrot"
 import { cn } from "@/lib/utils"
 
 const OPTIONS: {
@@ -26,10 +28,13 @@ export function ParticipationControls({
   activityId: string
   currentStatus: ParticipationStatus | null
 }) {
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(currentStatus)
+  const { active: brainrot } = useBrainrot()
 
   function handleClick(status: ParticipationStatus) {
     startTransition(async () => {
+      setOptimisticStatus(status)
       try {
         await setParticipation(activityId, status)
       } catch (error) {
@@ -43,28 +48,23 @@ export function ParticipationControls({
   return (
     <div className="flex gap-2">
       {OPTIONS.map((option) => {
-        const isActive = currentStatus === option.value
+        const isActive = optimisticStatus === option.value
         return (
           <Button
             key={option.value}
             type="button"
             variant={isActive ? "default" : "outline"}
             size="sm"
-            disabled={isPending}
             onClick={() => handleClick(option.value)}
             className={cn(
-              "flex-1",
+              "flex-1 transition-all duration-150 active:scale-95",
               isActive &&
                 option.value === "DECLINED" &&
                 "bg-destructive/90 hover:bg-destructive"
             )}
           >
-            {isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              <option.icon />
-            )}
-            {option.label}
+            <option.icon />
+            {brainrot ? brainrotLabel(option.label) : option.label}
           </Button>
         )
       })}

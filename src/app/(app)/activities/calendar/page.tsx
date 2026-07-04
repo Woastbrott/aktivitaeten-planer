@@ -18,6 +18,8 @@ import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { activityListInclude } from "@/lib/types"
 import { Button } from "@/components/ui/button"
+import { DayOverflowPopover } from "@/components/activities/day-overflow-popover"
+import { BrainrotText } from "@/components/brainrot-text"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = { title: "Kalender – Sommer-Planer" }
@@ -60,7 +62,9 @@ export default async function CalendarPage({
     <div className="grid gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="grid gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Kalender</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            <BrainrotText>Kalender</BrainrotText>
+          </h1>
           <p className="text-sm text-muted-foreground">
             {format(monthStart, "MMMM yyyy", { locale: de })}
           </p>
@@ -103,7 +107,7 @@ export default async function CalendarPage({
               <div
                 key={key}
                 className={cn(
-                  "min-h-24 border-b border-r p-1.5 last:border-r-0 sm:min-h-28 sm:p-2",
+                  "min-h-24 border-b border-r p-1.5 transition-colors last:border-r-0 hover:bg-muted/20 sm:min-h-28 sm:p-2",
                   !inMonth && "bg-muted/30"
                 )}
               >
@@ -121,16 +125,20 @@ export default async function CalendarPage({
                     <Link
                       key={activity.id}
                       href={`/activities/${activity.id}`}
-                      className="block truncate rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground"
+                      className="block truncate rounded-md bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-secondary-foreground transition-transform hover:scale-[1.03]"
                       title={activity.title}
                     >
                       {activity.title}
                     </Link>
                   ))}
                   {dayActivities.length > 3 && (
-                    <span className="px-1.5 text-[11px] text-muted-foreground">
-                      +{dayActivities.length - 3} weitere
-                    </span>
+                    <DayOverflowPopover
+                      day={format(day, "EEEE, d. MMMM", { locale: de })}
+                      activities={dayActivities.slice(3).map((a) => ({
+                        id: a.id,
+                        title: a.title,
+                      }))}
+                    />
                   )}
                 </div>
               </div>

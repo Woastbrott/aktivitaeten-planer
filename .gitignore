@@ -49,3 +49,6 @@ next-env.d.ts
 # user-uploaded activity images (local filesystem storage)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+.vercel
+.env*
