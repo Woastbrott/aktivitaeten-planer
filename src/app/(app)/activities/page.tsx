@@ -10,6 +10,7 @@ import { activityListInclude } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { ActivityCard } from "@/components/activities/activity-card"
 import { ActivityFilters } from "@/components/activities/activity-filters"
+import { ActivitiesSplitView } from "@/components/activities/activities-split-view"
 import { EmptyState } from "@/components/empty-state"
 import { BrainrotText } from "@/components/brainrot-text"
 
@@ -18,15 +19,18 @@ export const metadata: Metadata = { title: "Aktivitäten – Sommer-Planer" }
 export default async function ActivitiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mine?: string }>
+  searchParams: Promise<{ mine?: string; termin?: string }>
 }) {
-  const { mine } = await searchParams
+  const { mine, termin } = await searchParams
   const session = await auth()
   const userId = session!.user.id
 
   const where: Prisma.ActivityWhereInput = {}
   if (mine === "1") {
     where.participations = { some: { userId } }
+  }
+  if (termin === "offen") {
+    where.date = null
   }
 
   const activities = await prisma.activity.findMany({
@@ -74,17 +78,27 @@ export default async function ActivitiesPage({
           actionHref="/activities/new"
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {activities.map((activity, index) => (
-            <div
-              key={activity.id}
-              className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-500"
-              style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
-            >
-              <ActivityCard activity={activity} />
-            </div>
-          ))}
-        </div>
+        <ActivitiesSplitView
+          points={activities
+            .filter(
+              (a): a is typeof a & { lat: number; lng: number } =>
+                a.lat != null && a.lng != null
+            )
+            .map((a) => ({ id: a.id, title: a.title, lat: a.lat, lng: a.lng }))}
+          total={activities.length}
+        >
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            {activities.map((activity, index) => (
+              <div
+                key={activity.id}
+                className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both duration-500"
+                style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
+              >
+                <ActivityCard activity={activity} />
+              </div>
+            ))}
+          </div>
+        </ActivitiesSplitView>
       )}
     </div>
   )

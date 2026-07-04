@@ -15,7 +15,7 @@ export function ActivityCard({ activity }: { activity: ActivityListItem }) {
 
   return (
     <Link href={`/activities/${activity.id}`} className="group block">
-      <Card className="h-full gap-3 overflow-hidden p-4 transition-all group-hover:-translate-y-0.5 group-hover:shadow-md">
+      <Card className="h-full gap-3 overflow-hidden p-4 transition-all duration-200 ease-out group-hover:-translate-y-1 group-hover:shadow-lg">
         {coverImage && (
           <div className="relative -mx-4 -mt-4 aspect-video overflow-hidden bg-muted">
             <Image
